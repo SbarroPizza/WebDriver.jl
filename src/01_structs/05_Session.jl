@@ -21,12 +21,17 @@ struct Session{D<:Object}
     addr::String
     id::String
     attrs::D
-    function Session(wd::RemoteWebDriver)
+    function Session(wd::RemoteWebDriver, headless=false)
         @unpack addr = wd
+        d = Dict("browserName" => wd.capabilities.browserName, "timeouts" => wd.capabilities.timeouts, "unhandledPromptBehavior" => wd.capabilities.unhandledPromptBehavior)
+        d["goog:chromeOptions"] = Dict("args" => ["--window-size=1920,1080", "--start-maximized"])
+        if headless
+            d["goog:chromeOptions"] = Dict("args" => ["--headless", "--window-size=1920,1080", "--start-maximized"])
+        end
         response = HTTP.post(
             "$(wd.addr)/session",
             [("Content-Type" => "application/json")],
-            JSON3.write(Dict("desiredCapabilities" => wd.capabilities, wd.kw...)),
+            JSON3.write(Dict("desiredCapabilities" => d)),
         )
         @assert response.status == 200
         json = JSON3.read(response.body)
