@@ -24,7 +24,7 @@ struct Session{D<:Object}
     function Session(wd::RemoteWebDriver, headless=false)
         @unpack addr = wd
         d = Dict("browserName" => wd.capabilities.browserName, "timeouts" => wd.capabilities.timeouts, "unhandledPromptBehavior" => wd.capabilities.unhandledPromptBehavior)
-        d["goog:chromeOptions"] = Dict("args" => ["--window-size=1920,1080", "--start-maximized"])
+        d["goog:chromeOptions"] = Dict("args" => ["--window-size=1920,1080", "--start-maximized"], "prefs" => Dict("profile.default_content_setting_values.automatic_downloads" => 1,))
         if headless
             d["goog:chromeOptions"] = Dict("args" => ["--headless", "--window-size=1920,1080", "--start-maximized"])
         end
